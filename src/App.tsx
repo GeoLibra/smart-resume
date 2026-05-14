@@ -912,7 +912,7 @@ export default function App() {
       <nav className="absolute top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 px-4 md:px-8 flex items-center justify-between z-30 shrink-0 gap-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-resume-blue rounded flex items-center justify-center text-white font-bold text-xl">R</div>
-          <h1 className="text-base md:text-lg font-semibold tracking-tight text-slate-900">简历规划师 Pro</h1>
+          <h1 className="hidden md:block text-base md:text-lg font-semibold tracking-tight text-slate-900">简历规划师 Pro</h1>
         </div>
         <div className="flex items-center gap-2 md:gap-4 overflow-x-auto">
           <div className="flex gap-1">
@@ -943,7 +943,7 @@ export default function App() {
             title="查看编辑历史"
           >
             <Clock className="w-4 h-4 text-slate-500" />
-            历史记录
+            <span className="hidden md:inline">历史记录</span>
           </button>
           <button
             onClick={resetCanvas}
@@ -951,13 +951,13 @@ export default function App() {
             title="重置布局"
           >
             <RotateCcw className="w-4 h-4 text-slate-500" />
-            重置
+            <span className="hidden md:inline">重置</span>
           </button>
           <div {...getRootProps()} className="cursor-pointer">
             <input {...getInputProps()} />
             <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors">
               {isParsing ? <Loader2 className="w-4 h-4 animate-spin text-resume-blue" /> : <Upload className="w-4 h-4 text-slate-500" />}
-              <span className={isParsing ? "text-resume-blue" : ""}>
+              <span className={`hidden md:inline${isParsing ? ' text-resume-blue' : ''}`}>
                 {isParsing ? parseStep : '导入简历 (AI 解析)'}
               </span>
             </button>
