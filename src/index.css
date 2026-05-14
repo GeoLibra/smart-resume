@@ -205,6 +205,40 @@
     color: #0095ff !important;
   }
 
+  .resume-marked-text {
+    display: grid;
+    align-items: start;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .resume-marked-text-marker {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: visible;
+  }
+
+  .resume-marked-text .resume-text,
+  .resume-marked-text .resume-text-editor,
+  .resume-marked-text .resume-link {
+    min-width: 0;
+  }
+
+  .resume-marked-text-marker .resume-bullet {
+    flex: 0 0 auto;
+  }
+
+  .resume-marked-text-marker .resume-sparkle {
+    flex: 0 0 auto;
+  }
+
+  .resume-marked-text-marker .resume-quote-bar {
+    width: 6px;
+    height: 16px;
+  }
+
   .resume-rule {
     position: absolute;
     left: 0;
@@ -382,12 +416,9 @@
     background: transparent !important;
   }
 
-  .resume-sheet.is-exporting .resume-element-sparkle {
-    transform: translateY(7px);
-  }
-
+  .resume-sheet.is-exporting .resume-element-sparkle,
   .resume-sheet.is-exporting .resume-element-bullet {
-    transform: translateY(5px);
+    transform: none !important;
   }
 }
 

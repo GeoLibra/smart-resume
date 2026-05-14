@@ -1,4 +1,4 @@
-import html2canvas from 'html2canvas';
+import { snapdom } from '@zumer/snapdom';
 import { jsPDF } from 'jspdf';
 import { A4_HEIGHT, A4_WIDTH } from './resumeCanvas';
 
@@ -34,18 +34,18 @@ export const captureResumeCanvas = async (element: HTMLElement, scale = 3) => {
 
   try {
     const height = Math.max(A4_HEIGHT, clone.scrollHeight);
-    return await html2canvas(clone, {
+    clone.style.height = `${height}px`;
+    host.style.height = `${height}px`;
+
+    return await snapdom.toCanvas(clone, {
       scale,
-      useCORS: true,
-      allowTaint: true,
-      logging: false,
+      dpr: 1,
       backgroundColor: '#ffffff',
       width: A4_WIDTH,
       height,
-      windowWidth: A4_WIDTH,
-      windowHeight: height,
-      scrollX: 0,
-      scrollY: 0,
+      embedFonts: false,
+      cache: 'disabled',
+      outerShadows: true,
     });
   } finally {
     host.remove();
@@ -70,12 +70,14 @@ export const saveResumeAsPDF = async (element: HTMLElement, fileName: string) =>
     compress: true,
   });
 
-  const pagePixelHeight = A4_HEIGHT * scale;
+  const pagePixelHeight = Math.round(canvas.width * (A4_HEIGHT / A4_WIDTH));
   const pageCount = Math.ceil(canvas.height / pagePixelHeight);
 
   for (let page = 0; page < pageCount; page += 1) {
     if (page > 0) pdf.addPage('a4', 'portrait');
 
+    const sourceY = page * pagePixelHeight;
+    const sourceHeight = Math.min(pagePixelHeight, canvas.height - sourceY);
     const pageCanvas = document.createElement('canvas');
     pageCanvas.width = canvas.width;
     pageCanvas.height = pagePixelHeight;
@@ -88,13 +90,13 @@ export const saveResumeAsPDF = async (element: HTMLElement, fileName: string) =>
     context.drawImage(
       canvas,
       0,
-      page * pagePixelHeight,
+      sourceY,
       canvas.width,
-      pagePixelHeight,
+      sourceHeight,
       0,
       0,
       canvas.width,
-      pagePixelHeight
+      sourceHeight
     );
 
     pdf.addImage(pageCanvas.toDataURL('image/png'), 'PNG', 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM, undefined, 'FAST');

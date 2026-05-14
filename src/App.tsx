@@ -945,7 +945,7 @@ export default function App() {
             <input {...getInputProps()} />
             <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors">
               {isParsing ? <Loader2 className="w-4 h-4 animate-spin text-resume-blue" /> : <Upload className="w-4 h-4 text-slate-500" />}
-              <span className={`hidden md:inline${isParsing ? ' text-resume-blue' : ''}`}>
+              <span className={isParsing ? 'hidden md:inline text-resume-blue' : 'hidden md:inline'}>
                 {isParsing ? parseStep : '导入简历 (AI 解析)'}
               </span>
             </button>
@@ -973,7 +973,7 @@ export default function App() {
               disabled={isExportingPdf}
               aria-busy={isExportingPdf}
               aria-label={isExportingPdf ? '生成中...' : '导出 PDF'}
-              className={`inline-flex items-center justify-center gap-2 px-4 py-2 min-w-[2.5rem] md:min-w-[120px] bg-resume-blue text-white rounded-full text-sm font-medium shadow-sm transition-all ${
+              className={`inline-flex items-center justify-center gap-2 px-4 py-2 min-w-[2.75rem] md:min-w-[120px] bg-resume-blue text-white rounded-full text-sm font-medium shadow-sm transition-all ${
                 isExportingPdf ? 'opacity-75 cursor-wait' : 'hover:opacity-90'
               }`}
               title="导出 PDF"
@@ -1037,12 +1037,12 @@ export default function App() {
 
         {/* Preview Area */}
         <main
-          className={`relative flex-1 bg-slate-100 ${mobileWorkspaceTab === 'canvas' ? 'flex' : 'hidden md:flex'} justify-center p-4 md:p-8 overflow-y-auto overflow-x-auto transition-[padding] duration-200 ${
-            isHistoryPanelOpen ? 'pr-[412px]' : ''
+          className={`relative flex-1 bg-slate-100 ${mobileWorkspaceTab === 'canvas' ? 'flex' : 'hidden md:flex'} justify-center p-3 md:p-8 overflow-y-auto overflow-x-auto transition-[padding] duration-200 ${
+            isHistoryPanelOpen ? 'md:pr-[412px]' : ''
           }`}
         >
           {historyPreviewRecord && (
-            <div className="fixed top-20 left-[452px] right-[412px] z-30 flex justify-center pointer-events-none">
+            <div className="fixed top-20 left-2 right-2 md:left-[452px] md:right-[412px] z-30 flex justify-center pointer-events-none">
               <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-blue-200 bg-white px-4 py-2 shadow-xl">
                 <div>
                   <div className="text-xs font-bold text-slate-900">正在预览历史版本</div>

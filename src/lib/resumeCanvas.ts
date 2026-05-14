@@ -69,7 +69,7 @@ const sparkle = (id: string, x: number, y: number, color = '#0095ff'): CanvasEle
   zIndex: 1,
 });
 
-const QUOTE_BAR_HEIGHT = 20;
+const QUOTE_BAR_HEIGHT = 16;
 
 const quoteBar = (id: string, x: number, y: number, color = '#0095ff'): CanvasElement => ({
   id,
@@ -96,6 +96,11 @@ const styles = {
   project: singleLine({ fontSize: 13, fontWeight: 700, color: '#1e293b', lineHeight: 1.25 }),
   workTag: singleLine({ fontSize: 17, fontWeight: 700, color: '#0095ff', lineHeight: 1.1, textAlign: 'right' }),
 };
+
+const getFirstLineHeight = (style: CanvasTextStyle) => style.fontSize * (style.lineHeight ?? 1.35);
+
+const markerYForText = (textY: number, markerHeight: number, style: CanvasTextStyle) =>
+  textY + getFirstLineHeight(style) / 2 - markerHeight / 2;
 
 export const isSideProject = (project: string | SideProject): project is SideProject =>
   typeof project === 'object' && project !== null;
@@ -166,7 +171,7 @@ export const getTextElementAutoHeight = (element: CanvasElement, value = element
 
 const getElementsById = (elements: CanvasElement[]) => new Map(elements.map((element) => [element.id, element]));
 
-const getTextIdForMarker = (id: string) => {
+export const getTextIdForMarker = (id: string) => {
   if (id.endsWith('-bullet')) return id.replace(/-bullet$/, '-text');
   if (id.endsWith('-icon')) return id.replace(/-icon$/, '-text');
   if (id.endsWith('-description-bar')) return id.replace(/-description-bar$/, '-description');
@@ -484,7 +489,7 @@ export const createResumeCanvasElements = (data: ResumeData): CanvasElement[] =>
   data.skills.forEach((skill, index) => {
     const skillHeight = Math.max(18, estimateTextHeight(skill, contentWidth - 35, styles.body.fontSize, styles.body.lineHeight));
     y = avoidPageBreak(y, skillHeight + 4);
-    elements.push(sparkle(`skills-${index}-icon`, PAGE_MARGIN, y + 2));
+    elements.push(sparkle(`skills-${index}-icon`, PAGE_MARGIN, markerYForText(y, 15, styles.body)));
     elements.push(text(`skills-${index}-text`, skill, PAGE_MARGIN + 23, y, contentWidth - 35, skillHeight, styles.body));
     y += skillHeight + 4;
   });
@@ -501,7 +506,7 @@ export const createResumeCanvasElements = (data: ResumeData): CanvasElement[] =>
     work.summary?.forEach((item, summaryIndex) => {
       const itemHeight = Math.max(18, estimateTextHeight(item, contentWidth - 30, styles.body.fontSize, styles.body.lineHeight));
       y = avoidPageBreak(y, itemHeight + 4);
-      elements.push(bullet(`work-${workIndex}-summary-${summaryIndex}-bullet`, PAGE_MARGIN + 3, y + 6));
+      elements.push(bullet(`work-${workIndex}-summary-${summaryIndex}-bullet`, PAGE_MARGIN + 3, markerYForText(y, 6, styles.body)));
       elements.push(text(`work-${workIndex}-summary-${summaryIndex}-text`, item, PAGE_MARGIN + 24, y, contentWidth - 30, itemHeight, styles.body));
       y += itemHeight + 4;
     });
@@ -536,7 +541,7 @@ export const createResumeCanvasElements = (data: ResumeData): CanvasElement[] =>
 
       if (project.description) {
         y = avoidPageBreak(y, descriptionHeight + 4);
-        elements.push(quoteBar(`work-${workIndex}-project-${projectIndex}-description-bar`, PAGE_MARGIN, y + 2));
+        elements.push(quoteBar(`work-${workIndex}-project-${projectIndex}-description-bar`, PAGE_MARGIN, markerYForText(y, QUOTE_BAR_HEIGHT, styles.body)));
         elements.push(
           text(
             `work-${workIndex}-project-${projectIndex}-description`,
@@ -554,7 +559,7 @@ export const createResumeCanvasElements = (data: ResumeData): CanvasElement[] =>
       project.points.forEach((point, pointIndex) => {
         const pointHeight = Math.max(18, estimateTextHeight(point, contentWidth - 30, styles.body.fontSize, styles.body.lineHeight));
         y = avoidPageBreak(y, pointHeight + 4);
-        elements.push(bullet(`work-${workIndex}-project-${projectIndex}-point-${pointIndex}-bullet`, PAGE_MARGIN + 3, y + 6));
+        elements.push(bullet(`work-${workIndex}-project-${projectIndex}-point-${pointIndex}-bullet`, PAGE_MARGIN + 3, markerYForText(y, 6, styles.body)));
         elements.push(
           text(
             `work-${workIndex}-project-${projectIndex}-point-${pointIndex}-text`,
@@ -584,7 +589,7 @@ export const createResumeCanvasElements = (data: ResumeData): CanvasElement[] =>
       const projectHref = getSideProjectHref(project);
       const itemHeight = Math.max(18, estimateTextHeight(projectText, contentWidth - 30, styles.body.fontSize, styles.body.lineHeight));
       y = avoidPageBreak(y, itemHeight + 4);
-      elements.push(bullet(`social-${index}-bullet`, PAGE_MARGIN + 3, y + 6));
+      elements.push(bullet(`social-${index}-bullet`, PAGE_MARGIN + 3, markerYForText(y, 6, styles.body)));
       elements.push(text(`social-${index}-text`, projectText, PAGE_MARGIN + 24, y, contentWidth - 30, itemHeight, styles.body, 1, projectHref));
       y += itemHeight + 4;
     });
@@ -597,7 +602,7 @@ export const createResumeCanvasElements = (data: ResumeData): CanvasElement[] =>
     data.selfEvaluation.forEach((item, index) => {
       const itemHeight = Math.max(18, estimateTextHeight(item, contentWidth - 35, styles.body.fontSize, styles.body.lineHeight));
       y = avoidPageBreak(y, itemHeight + 4);
-      elements.push(sparkle(`evaluation-${index}-icon`, PAGE_MARGIN, y + 2));
+      elements.push(sparkle(`evaluation-${index}-icon`, PAGE_MARGIN, markerYForText(y, 15, styles.body)));
       elements.push(text(`evaluation-${index}-text`, item, PAGE_MARGIN + 23, y, contentWidth - 35, itemHeight, styles.body));
       y += itemHeight + 4;
     });
