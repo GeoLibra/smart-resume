@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Loader2, RotateCcw, Undo2, Redo2, Clock } from 'lucide-react';
+import { Upload, Loader2, RotateCcw, Undo2, Redo2, Clock, FileText, Monitor } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 import ResumeCanvas, { HistoryPositionOverlay } from './components/ResumeCanvas';
@@ -29,6 +29,9 @@ import {
 } from './lib/storage';
 
 const RESUME_LAYOUT_VERSION = 6;
+
+type MobileWorkspaceTab = 'editor' | 'canvas';
+
 
 const sectionElementIds: Record<string, string[]> = {
   '基本信息': ['name', 'title'],
@@ -499,6 +502,7 @@ export default function App() {
   const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
   const [historyPreviewRecord, setHistoryPreviewRecord] = useState<HistoryRecord | null>(null);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [mobileWorkspaceTab, setMobileWorkspaceTab] = useState<MobileWorkspaceTab>('editor');
   const resumeRef = useRef<HTMLDivElement>(null);
   const resumeDataRef = useRef(resumeData);
   const canvasElementsRef = useRef(canvasElements);
@@ -884,12 +888,12 @@ export default function App() {
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden font-sans text-slate-800">
       {/* Top Navigation Bar */}
-      <nav className="absolute top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between z-20 shrink-0">
+      <nav className="absolute top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 px-4 md:px-8 flex items-center justify-between z-30 shrink-0 gap-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-resume-blue rounded flex items-center justify-center text-white font-bold text-xl">R</div>
-          <h1 className="text-lg font-semibold tracking-tight text-slate-900">简历规划师 Pro</h1>
+          <h1 className="text-base md:text-lg font-semibold tracking-tight text-slate-900">简历规划师 Pro</h1>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4">
           <div className="flex gap-1">
             <button
               onClick={undoCanvas}
@@ -966,16 +970,45 @@ export default function App() {
         </div>
       </nav>
 
+
+
+      <div className="md:hidden fixed top-16 left-0 right-0 z-20 bg-white border-b border-slate-200 px-4 py-2">
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setMobileWorkspaceTab('editor')}
+            className={`inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              mobileWorkspaceTab === 'editor'
+                ? 'bg-slate-900 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            表单
+          </button>
+          <button
+            onClick={() => setMobileWorkspaceTab('canvas')}
+            className={`inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              mobileWorkspaceTab === 'canvas'
+                ? 'bg-slate-900 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            <Monitor className="w-4 h-4" />
+            画布
+          </button>
+        </div>
+      </div>
+
       {/* Main Workspace (Offset by Nav) */}
-      <div className="flex flex-1 pt-16 overflow-hidden">
+      <div className="flex flex-1 pt-[112px] md:pt-16 overflow-hidden">
         {/* Sidebar Controls */}
-        <aside className="w-[420px] bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-hidden">
+        <aside className={`w-full md:w-[420px] bg-white md:border-r border-slate-200 flex flex-col shrink-0 overflow-hidden ${mobileWorkspaceTab === 'editor' ? 'flex' : 'hidden md:flex'}`}>
           <ResumeEditor data={resumeData} onChange={handleResumeDataChange} />
         </aside>
 
         {/* Preview Area */}
         <main
-          className={`relative flex-1 bg-slate-100 flex justify-center p-8 overflow-y-auto overflow-x-auto transition-[padding] duration-200 ${
+          className={`relative flex-1 bg-slate-100 ${mobileWorkspaceTab === 'canvas' ? 'flex' : 'hidden md:flex'} justify-center p-4 md:p-8 overflow-y-auto overflow-x-auto transition-[padding] duration-200 ${
             isHistoryPanelOpen ? 'pr-[412px]' : ''
           }`}
         >
