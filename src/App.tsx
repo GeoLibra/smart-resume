@@ -984,7 +984,8 @@ export default function App() {
               onClick={exportAsPDF}
               disabled={isExportingPdf}
               aria-busy={isExportingPdf}
-              className={`inline-flex items-center justify-center gap-2 px-4 py-2 bg-resume-blue text-white rounded-full text-sm font-medium shadow-sm transition-all ${
+              aria-label={isExportingPdf ? '生成中...' : '导出 PDF'}
+              className={`inline-flex items-center justify-center gap-2 px-4 py-2 min-w-[2.5rem] md:min-w-[120px] bg-resume-blue text-white rounded-full text-sm font-medium shadow-sm transition-all ${
                 isExportingPdf ? 'opacity-75 cursor-wait' : 'hover:opacity-90'
               }`}
               title="导出 PDF"
