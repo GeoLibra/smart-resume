@@ -7,6 +7,7 @@ import {
   A4_WIDTH,
   deleteElementsAndReflow,
   duplicateElement,
+  getTextIdForMarker,
   getTextElementWhiteSpace,
   getResumeCanvasHeight,
   snapElementPosition,
@@ -44,6 +45,14 @@ interface SelectionBox extends Bounds {
   startY: number;
 }
 
+interface TextMarkerLayout {
+  marker: CanvasElement;
+  left: number;
+  width: number;
+  markerColumnWidth: number;
+  firstLineHeight: number;
+}
+
 interface MoveDragState {
   mode: 'move';
   pointerId: number;
@@ -74,6 +83,45 @@ const textStyle = (element: CanvasElement): React.CSSProperties => ({
   textDecoration: element.style?.textDecoration,
   whiteSpace: getTextElementWhiteSpace(element),
 });
+
+const getTextFirstLineHeight = (element: CanvasElement) => {
+  const fontSize = element.style?.fontSize ?? 13;
+  return fontSize * (element.style?.lineHeight ?? 1.35);
+};
+
+const getMarkerForText = (element: CanvasElement, elementsById: Map<string, CanvasElement>) => {
+  if (element.type !== 'text') return null;
+
+  const markerIds = element.id.endsWith('-description')
+    ? [`${element.id}-bar`]
+    : element.id.endsWith('-text')
+      ? [element.id.replace(/-text$/, '-bullet'), element.id.replace(/-text$/, '-icon')]
+      : [];
+
+  return markerIds
+    .map((id) => elementsById.get(id))
+    .find((marker) => marker && ['bullet', 'sparkle', 'quote-bar'].includes(marker.type)) ?? null;
+};
+
+const getTextMarkerLayout = (
+  element: CanvasElement,
+  elementsById: Map<string, CanvasElement>
+): TextMarkerLayout | null => {
+  const marker = getMarkerForText(element, elementsById);
+  if (!marker) return null;
+
+  const left = Math.min(marker.x, element.x);
+  const markerColumnWidth = Math.max(marker.width + 8, element.x - left);
+  const width = Math.max(element.width, element.x + element.width - left);
+
+  return {
+    marker,
+    left,
+    width,
+    markerColumnWidth,
+    firstLineHeight: getTextFirstLineHeight(element),
+  };
+};
 
 const getBounds = (items: CanvasElement[]): Bounds | null => {
   if (!items.length) return null;
@@ -183,6 +231,7 @@ const ResumeCanvas = forwardRef<HTMLDivElement, ResumeCanvasProps>(
       () => elements.filter((element) => selectedSet.has(element.id)),
       [elements, selectedSet]
     );
+    const elementsById = useMemo(() => new Map(elements.map((element) => [element.id, element])), [elements]);
     const selectedBounds = useMemo(() => getBounds(selectedElements), [selectedElements]);
 
     const getConnectorStyle = (overlay: HistoryPositionOverlay): React.CSSProperties => {
@@ -531,12 +580,38 @@ const ResumeCanvas = forwardRef<HTMLDivElement, ResumeCanvasProps>(
       setSelectionBox(null);
     };
 
-    const renderElementContent = (element: CanvasElement) => {
+    const renderMarkerContent = (marker: CanvasElement) => {
+      if (marker.type === 'bullet') {
+        return <span className="resume-bullet" style={{ backgroundColor: marker.color }} />;
+      }
+
+      if (marker.type === 'quote-bar') {
+        return <span className="resume-quote-bar" style={{ backgroundColor: marker.color }} />;
+      }
+
+      return <Sparkles className="resume-sparkle" style={{ color: marker.color }} />;
+    };
+
+    const renderMarkedText = (markerLayout: TextMarkerLayout, textContent: React.ReactNode) => (
+      <div
+        className={`resume-marked-text resume-marked-text-${markerLayout.marker.type}`}
+        style={{
+          gridTemplateColumns: `${markerLayout.markerColumnWidth}px minmax(0, 1fr)`,
+        }}
+      >
+        <span className="resume-marked-text-marker" style={{ height: markerLayout.firstLineHeight }}>
+          {renderMarkerContent(markerLayout.marker)}
+        </span>
+        {textContent}
+      </div>
+    );
+
+    const renderElementContent = (element: CanvasElement, markerLayout?: TextMarkerLayout | null) => {
       if (element.type === 'text') {
         if (editingId === element.id) {
           const textValue = element.text ?? '';
 
-          return (
+          const editor = (
             <textarea
               ref={(node) => {
                 editingTextareaRef.current = node;
@@ -566,10 +641,12 @@ const ResumeCanvas = forwardRef<HTMLDivElement, ResumeCanvasProps>(
               style={textStyle(element)}
             />
           );
+
+          return markerLayout ? renderMarkedText(markerLayout, editor) : editor;
         }
 
         if (element.href) {
-          return (
+          const link = (
             <a
               ref={(node) => setTextMeasureNode(element.id, node)}
               className="resume-text resume-link"
@@ -590,13 +667,17 @@ const ResumeCanvas = forwardRef<HTMLDivElement, ResumeCanvasProps>(
               {element.text}
             </a>
           );
+
+          return markerLayout ? renderMarkedText(markerLayout, link) : link;
         }
 
-        return (
+        const textNode = (
           <div ref={(node) => setTextMeasureNode(element.id, node)} className="resume-text" style={textStyle(element)}>
             {element.text}
           </div>
         );
+
+        return markerLayout ? renderMarkedText(markerLayout, textNode) : textNode;
       }
 
       if (element.type === 'line') {
@@ -697,14 +778,18 @@ const ResumeCanvas = forwardRef<HTMLDivElement, ResumeCanvasProps>(
           ))}
 
           {elements.map((element) => {
+            const textIdForMarker = getTextIdForMarker(element.id);
+            if (textIdForMarker && elementsById.has(textIdForMarker)) return null;
+
             const selected = selectedSet.has(element.id);
             const historyHighlighted = historyHighlightSet.has(element.id);
             const historyLabel = historyHighlightLabels[element.id];
             const isLine = element.type === 'line';
+            const textMarkerLayout = getTextMarkerLayout(element, elementsById);
             const elementStyle: React.CSSProperties = {
-              left: element.x,
+              left: textMarkerLayout?.left ?? element.x,
               top: isLine ? element.y - 5 : element.y,
-              width: element.width,
+              width: textMarkerLayout?.width ?? element.width,
               height: isLine ? 12 : element.height,
               zIndex: element.zIndex ?? 1,
             };
@@ -728,7 +813,7 @@ const ResumeCanvas = forwardRef<HTMLDivElement, ResumeCanvasProps>(
                   startEditing(element);
                 }}
               >
-                {renderElementContent(element)}
+                {renderElementContent(element, textMarkerLayout)}
                 {historyLabel && (
                   <div className="canvas-chrome resume-history-badge">
                     {historyLabel}
