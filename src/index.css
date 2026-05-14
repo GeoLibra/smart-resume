@@ -382,12 +382,9 @@
     background: transparent !important;
   }
 
-  .resume-sheet.is-exporting .resume-element-sparkle {
-    transform: translateY(7px);
-  }
-
+  .resume-sheet.is-exporting .resume-element-sparkle,
   .resume-sheet.is-exporting .resume-element-bullet {
-    transform: translateY(5px);
+    transform: none !important;
   }
 }
 

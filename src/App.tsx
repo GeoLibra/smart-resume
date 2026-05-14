@@ -884,12 +884,12 @@ export default function App() {
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden font-sans text-slate-800">
       {/* Top Navigation Bar */}
-      <nav className="absolute top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between z-20 shrink-0">
+      <nav className="absolute top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 px-3 md:px-8 flex items-center justify-between z-20 shrink-0 gap-2">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-resume-blue rounded flex items-center justify-center text-white font-bold text-xl">R</div>
           <h1 className="text-lg font-semibold tracking-tight text-slate-900">简历规划师 Pro</h1>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4">
           <div className="flex gap-1">
             <button
               onClick={undoCanvas}
@@ -967,20 +967,20 @@ export default function App() {
       </nav>
 
       {/* Main Workspace (Offset by Nav) */}
-      <div className="flex flex-1 pt-16 overflow-hidden">
+      <div className="flex flex-1 pt-16 overflow-hidden flex-col md:flex-row">
         {/* Sidebar Controls */}
-        <aside className="w-[420px] bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-hidden">
+        <aside className="w-full md:w-[420px] bg-white md:border-r border-b md:border-b-0 border-slate-200 flex flex-col shrink-0 overflow-hidden h-[48vh] md:h-auto">
           <ResumeEditor data={resumeData} onChange={handleResumeDataChange} />
         </aside>
 
         {/* Preview Area */}
         <main
-          className={`relative flex-1 bg-slate-100 flex justify-center p-8 overflow-y-auto overflow-x-auto transition-[padding] duration-200 ${
-            isHistoryPanelOpen ? 'pr-[412px]' : ''
+          className={`relative flex-1 bg-slate-100 flex justify-center p-3 md:p-8 overflow-y-auto overflow-x-auto transition-[padding] duration-200 ${
+            isHistoryPanelOpen ? 'md:pr-[412px]' : ''
           }`}
         >
           {historyPreviewRecord && (
-            <div className="fixed top-20 left-[452px] right-[412px] z-30 flex justify-center pointer-events-none">
+            <div className="fixed top-20 left-2 right-2 md:left-[452px] md:right-[412px] z-30 flex justify-center pointer-events-none">
               <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-blue-200 bg-white px-4 py-2 shadow-xl">
                 <div>
                   <div className="text-xs font-bold text-slate-900">正在预览历史版本</div>
