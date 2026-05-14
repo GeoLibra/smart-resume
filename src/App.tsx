@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Loader2, RotateCcw, Undo2, Redo2, Clock, FileText, Monitor, Lock, LockOpen } from 'lucide-react';
+import { Upload, Loader2, RotateCcw, Undo2, Redo2, Clock, FileText, Monitor, Lock, LockOpen, ImageDown, Printer, FileDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 import ResumeCanvas, { HistoryPositionOverlay } from './components/ResumeCanvas';
@@ -912,7 +912,7 @@ export default function App() {
       <nav className="absolute top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 px-4 md:px-8 flex items-center justify-between z-30 shrink-0 gap-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-resume-blue rounded flex items-center justify-center text-white font-bold text-xl">R</div>
-          <h1 className="text-base md:text-lg font-semibold tracking-tight text-slate-900">简历规划师 Pro</h1>
+          <h1 className="hidden md:block text-base md:text-lg font-semibold tracking-tight text-slate-900">简历规划师 Pro</h1>
         </div>
         <div className="flex items-center gap-2 md:gap-4 overflow-x-auto">
           <div className="flex gap-1">
@@ -943,7 +943,7 @@ export default function App() {
             title="查看编辑历史"
           >
             <Clock className="w-4 h-4 text-slate-500" />
-            历史记录
+            <span className="hidden md:inline">历史记录</span>
           </button>
           <button
             onClick={resetCanvas}
@@ -951,13 +951,13 @@ export default function App() {
             title="重置布局"
           >
             <RotateCcw className="w-4 h-4 text-slate-500" />
-            重置
+            <span className="hidden md:inline">重置</span>
           </button>
           <div {...getRootProps()} className="cursor-pointer">
             <input {...getInputProps()} />
             <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors">
               {isParsing ? <Loader2 className="w-4 h-4 animate-spin text-resume-blue" /> : <Upload className="w-4 h-4 text-slate-500" />}
-              <span className={isParsing ? "text-resume-blue" : ""}>
+              <span className={`hidden md:inline${isParsing ? ' text-resume-blue' : ''}`}>
                 {isParsing ? parseStep : '导入简历 (AI 解析)'}
               </span>
             </button>
@@ -966,26 +966,32 @@ export default function App() {
           <div className="flex gap-2">
             <button
               onClick={exportAsImage}
-              className="px-4 py-2 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors"
+              title="导出图片"
             >
-              导出图片
+              <ImageDown className="w-4 h-4 text-slate-500 shrink-0" />
+              <span className="hidden md:inline">导出图片</span>
             </button>
             <button
               onClick={handlePrint}
-              className="px-4 py-2 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors"
+              className="hidden md:inline-flex items-center justify-center gap-2 px-4 py-2 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors"
+              title="打印 PDF"
             >
-              打印 PDF
+              <Printer className="w-4 h-4 text-slate-500 shrink-0" />
+              <span>打印 PDF</span>
             </button>
             <button
               onClick={exportAsPDF}
               disabled={isExportingPdf}
               aria-busy={isExportingPdf}
-              className={`inline-flex w-[136px] items-center justify-center gap-2 px-4 py-2 bg-resume-blue text-white rounded-full text-sm font-medium shadow-sm transition-all ${
+              aria-label={isExportingPdf ? '生成中...' : '导出 PDF'}
+              className={`inline-flex items-center justify-center gap-2 px-4 py-2 min-w-[2.5rem] md:min-w-[120px] bg-resume-blue text-white rounded-full text-sm font-medium shadow-sm transition-all ${
                 isExportingPdf ? 'opacity-75 cursor-wait' : 'hover:opacity-90'
               }`}
+              title="导出 PDF"
             >
-              {isExportingPdf && <Loader2 className="w-4 h-4 animate-spin" />}
-              {isExportingPdf ? '生成中...' : '直接下载 PDF'}
+              {isExportingPdf ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : <FileDown className="w-4 h-4 shrink-0" />}
+              <span className="hidden md:inline">{isExportingPdf ? '生成中...' : '导出 PDF'}</span>
             </button>
           </div>
         </div>
