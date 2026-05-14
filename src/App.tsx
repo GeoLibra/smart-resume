@@ -592,6 +592,7 @@ export default function App() {
       }
     }, 1000); // 1秒后保存
 
+  
   return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -706,6 +707,7 @@ export default function App() {
     };
 
     window.addEventListener('keydown', handleShortcut);
+  
   return () => window.removeEventListener('keydown', handleShortcut);
   }, [redoCanvas, undoCanvas]);
 
@@ -767,6 +769,7 @@ export default function App() {
 
   const getResumeFileName = () => {
     const canvasName = canvasElements.find((element) => element.id === 'name')?.text;
+  
   return (canvasName || resumeData.name || 'resume').trim().replace(/[\\/:*?"<>|]/g, '-');
   };
 
@@ -848,6 +851,7 @@ export default function App() {
     const elementsById = new Map<string, CanvasElement>(
       historyPreviewData.canvasElements.map((element): [string, CanvasElement] => [element.id, element])
     );
+  
   return (historyPreviewRecord.changes ?? []).flatMap((change) => {
       const match = change.path?.match(/^canvasElements\.([^.]*)\.position$/);
       if (!match) return [];
