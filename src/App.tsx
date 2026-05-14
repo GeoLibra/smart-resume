@@ -593,9 +593,6 @@ export default function App() {
     }, 1000); // 1秒后保存
 
   
-  const isMobileViewport = typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false;
-  const isCanvasReadOnly = Boolean(historyPreviewRecord) || (isMobileViewport && mobileWorkspaceTab === 'canvas' && isMobileCanvasLocked);
-
   return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -711,9 +708,6 @@ export default function App() {
 
     window.addEventListener('keydown', handleShortcut);
   
-  const isMobileViewport = typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false;
-  const isCanvasReadOnly = Boolean(historyPreviewRecord) || (isMobileViewport && mobileWorkspaceTab === 'canvas' && isMobileCanvasLocked);
-
   return () => window.removeEventListener('keydown', handleShortcut);
   }, [redoCanvas, undoCanvas]);
 
@@ -776,9 +770,6 @@ export default function App() {
   const getResumeFileName = () => {
     const canvasName = canvasElements.find((element) => element.id === 'name')?.text;
   
-  const isMobileViewport = typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false;
-  const isCanvasReadOnly = Boolean(historyPreviewRecord) || (isMobileViewport && mobileWorkspaceTab === 'canvas' && isMobileCanvasLocked);
-
   return (canvasName || resumeData.name || 'resume').trim().replace(/[\\/:*?"<>|]/g, '-');
   };
 
@@ -861,9 +852,6 @@ export default function App() {
       historyPreviewData.canvasElements.map((element): [string, CanvasElement] => [element.id, element])
     );
   
-  const isMobileViewport = typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false;
-  const isCanvasReadOnly = Boolean(historyPreviewRecord) || (isMobileViewport && mobileWorkspaceTab === 'canvas' && isMobileCanvasLocked);
-
   return (historyPreviewRecord.changes ?? []).flatMap((change) => {
       const match = change.path?.match(/^canvasElements\.([^.]*)\.position$/);
       if (!match) return [];
