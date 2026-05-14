@@ -592,10 +592,6 @@ export default function App() {
       }
     }, 1000); // 1秒后保存
 
-  
-  const isMobileViewport = typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false;
-  const isCanvasReadOnly = Boolean(historyPreviewRecord) || (isMobileViewport && mobileWorkspaceTab === 'canvas' && isMobileCanvasLocked);
-
   return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -710,10 +706,6 @@ export default function App() {
     };
 
     window.addEventListener('keydown', handleShortcut);
-  
-  const isMobileViewport = typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false;
-  const isCanvasReadOnly = Boolean(historyPreviewRecord) || (isMobileViewport && mobileWorkspaceTab === 'canvas' && isMobileCanvasLocked);
-
   return () => window.removeEventListener('keydown', handleShortcut);
   }, [redoCanvas, undoCanvas]);
 
@@ -775,10 +767,6 @@ export default function App() {
 
   const getResumeFileName = () => {
     const canvasName = canvasElements.find((element) => element.id === 'name')?.text;
-  
-  const isMobileViewport = typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false;
-  const isCanvasReadOnly = Boolean(historyPreviewRecord) || (isMobileViewport && mobileWorkspaceTab === 'canvas' && isMobileCanvasLocked);
-
   return (canvasName || resumeData.name || 'resume').trim().replace(/[\\/:*?"<>|]/g, '-');
   };
 
@@ -860,10 +848,6 @@ export default function App() {
     const elementsById = new Map<string, CanvasElement>(
       historyPreviewData.canvasElements.map((element): [string, CanvasElement] => [element.id, element])
     );
-  
-  const isMobileViewport = typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false;
-  const isCanvasReadOnly = Boolean(historyPreviewRecord) || (isMobileViewport && mobileWorkspaceTab === 'canvas' && isMobileCanvasLocked);
-
   return (historyPreviewRecord.changes ?? []).flatMap((change) => {
       const match = change.path?.match(/^canvasElements\.([^.]*)\.position$/);
       if (!match) return [];
@@ -957,7 +941,7 @@ export default function App() {
             <input {...getInputProps()} />
             <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors">
               {isParsing ? <Loader2 className="w-4 h-4 animate-spin text-resume-blue" /> : <Upload className="w-4 h-4 text-slate-500" />}
-              <span className={`hidden md:inline${isParsing ? ' text-resume-blue' : ''}`}>
+              <span className={isParsing ? 'hidden md:inline text-resume-blue' : 'hidden md:inline'}>
                 {isParsing ? parseStep : '导入简历 (AI 解析)'}
               </span>
             </button>
@@ -985,7 +969,7 @@ export default function App() {
               disabled={isExportingPdf}
               aria-busy={isExportingPdf}
               aria-label={isExportingPdf ? '生成中...' : '导出 PDF'}
-              className={`inline-flex items-center justify-center gap-2 px-4 py-2 min-w-[2.5rem] md:min-w-[120px] bg-resume-blue text-white rounded-full text-sm font-medium shadow-sm transition-all ${
+              className={`inline-flex items-center justify-center gap-2 px-4 py-2 min-w-[2.75rem] md:min-w-[120px] bg-resume-blue text-white rounded-full text-sm font-medium shadow-sm transition-all ${
                 isExportingPdf ? 'opacity-75 cursor-wait' : 'hover:opacity-90'
               }`}
               title="导出 PDF"
